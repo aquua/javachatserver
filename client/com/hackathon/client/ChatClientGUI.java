@@ -30,6 +30,7 @@ implements WindowListener, MouseListener, KeyListener{
 	private TextArea msgArea = null;
 	private TextField sendArea = null;
 	private DataOutputStream out = null;
+	private String nick = null;
 	
 	public ChatClientGUI(String title, DataOutputStream out) {
 		super(title);
@@ -74,8 +75,18 @@ implements WindowListener, MouseListener, KeyListener{
 				while (true) {
 					try {
 						String rawMsg = in.readUTF();
-						System.out.println("received from server : " + rawMsg);
-						msgArea.append(rawMsg + "\n");
+						System.out.println(rawMsg);
+						String[] packet = rawMsg.split(":");
+						String status = packet[0];
+						if (status.equals("nick")) {
+							nick = packet[1];
+							msgArea.append("your nick is " + nick + "\n");
+						} else if (status.equals("msg")){
+							msgArea.append(packet[1] + " : " + packet[2] + "\n");
+						} else if (status.equals("error")){
+							msgArea.append(packet[1] + "\n");
+						}
+						
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -90,12 +101,20 @@ implements WindowListener, MouseListener, KeyListener{
 		sendArea.setText("");
 		if (msg != "") {
 			try {
-				out.writeUTF(msg);
+				if (nick == null) {
+					out.writeUTF("1:" + msg); // login with nick
+				} else {
+					out.writeUTF("2:" + msg); // broadcast msg
+				}
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
+	}
+	
+	public void printText(String text) {
+		msgArea.append(text + "\n");
 	}
 	
 	@Override

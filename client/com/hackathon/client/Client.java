@@ -37,7 +37,7 @@ public class Client {
 		
 		// display msg pipe from server
 		gui.pipeToMsgArea(in);
-		
-		
+		gui.printText("server connected.");
+		gui.printText("please type your name first!");
 	}
 }

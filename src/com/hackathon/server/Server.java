@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class Server {
 
+	private static int userId = 1;
 	public static Map<String,ClientThread> clients = new HashMap();
 	
 	public static void main(String[] args) throws Exception {
@@ -15,7 +16,6 @@ public class Server {
 		while(true){
 			Socket socket = serverSocket.accept();
 			ClientThread client = new ClientThread(socket);
-			Server.clients.put(System.currentTimeMillis() + "", client);
 			new Thread(client).start();
 		}
 	}
