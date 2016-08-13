@@ -23,9 +23,9 @@ public class ClientThread implements Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			int s = 0;
+			String s = null;
 			try {
-				s = in.read();
+				s = in.readUTF();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -37,10 +37,10 @@ public class ClientThread implements Runnable {
 		}
 	}
 
-	private void send(int s) {
+	private void send(String s) {
 		// TODO Auto-generated method stub
 		try {
-			out.write(s);
+			out.writeUTF(s);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

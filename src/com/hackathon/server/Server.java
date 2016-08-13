@@ -15,7 +15,7 @@ public class Server {
 		ServerSocket serverSocket = new ServerSocket(5000);
 
 		while(true){
-			Socket  socket = serverSocket.accept();
+			Socket socket = serverSocket.accept();
 			ClientThread client = new ClientThread(socket);
 			map.put(System.currentTimeMillis() + "", client);
 			new Thread(client).start();
