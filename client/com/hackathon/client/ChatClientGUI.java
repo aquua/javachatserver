@@ -14,6 +14,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 
@@ -22,12 +25,12 @@ import javax.swing.JFrame;
 
 public class ChatClientGUI extends JFrame
 implements WindowListener, MouseListener, KeyListener{
-
+	
 	private TextArea msgArea = null;
 	private TextField sendArea = null;
-	private String nick = null;
+	private DataOutputStream out = null;
 	
-	public ChatClientGUI(String title) {
+	public ChatClientGUI(String title, DataOutputStream out) {
 		super(title);
 		
 		this.addWindowListener(this);
@@ -55,20 +58,32 @@ implements WindowListener, MouseListener, KeyListener{
 		send.addMouseListener(this);
 		p.add(send);
 		
-		Button clear = new Button("Clear");
-		clear.addMouseListener(this);
-		p.add(clear);
-		
 		this.add(p, "South");
 		this.setVisible(true);
 		
-		// 
-	}
-	 
-	public static void main(String[] args) {
-		ChatClientGUI c = new ChatClientGUI("Chat Client v1.0");
+		this.out = out;
 		
 	}
+	
+	public void pipeToMsgArea(DataInputStream in) {
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						String rawMsg = in.readUTF();
+						System.out.println("received from server : " + rawMsg);
+						msgArea.append(rawMsg + "\n");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();
+	}
+	
 	@Override
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
@@ -90,12 +105,20 @@ implements WindowListener, MouseListener, KeyListener{
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
-		
+		String msg = sendArea.getText();
+		sendArea.setText("");
+		if (msg != "") {
+			try {
+				out.writeUTF(msg);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		
 		
 	}
 

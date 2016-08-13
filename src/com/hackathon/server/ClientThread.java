@@ -13,7 +13,6 @@ public class ClientThread implements Runnable {
 	private Socket socket;
 	private DataInputStream in;
 	private DataOutputStream out;
-	private String nick;
 	
 	public ClientThread(Socket socket) throws IOException {
 		this.socket = socket;
@@ -31,24 +30,16 @@ public class ClientThread implements Runnable {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				break;
 			}
 			
 		}
 	}
 	
 	private void process(String rawMsg) {
-		String[] packet = rawMsg.split(":");
-		String code = packet[0];
-		
-		if (code.equals("1")) {
-			nick = packet[1];
-			Server.map.put(nick, this);
-		} else if (code.equals("2")) {
-			String dest = packet[1];
-			String msg = packet[2];
-			Server.map.get(dest).send(msg);			
-		} else {
-			send("protocol error");
+		// just broadcast to all
+		for (ClientThread client: Server.clients.values()) {
+			client.send(rawMsg);
 		}
 	}
 
