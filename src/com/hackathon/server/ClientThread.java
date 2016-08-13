@@ -1,41 +1,49 @@
 package com.hackathon.server;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Collection;
 
 public class ClientThread implements Runnable {
 
-	
-	
 	private Socket socket;
-	public ClientThread(Socket socket) {
+	private DataInputStream in;
+	private DataOutputStream out;
+	
+	public ClientThread(Socket socket) throws IOException {
 		this.socket = socket;
+		in = new DataInputStream(socket.getInputStream());
+		out = new DataOutputStream(socket.getOutputStream());
 	}
+	
 	@Override
 	public void run() {
-		OutputStream out = null;
-		DataOutputStream dos = null;
-		
-		try {
-			out = socket.getOutputStream();
-			dos = new DataOutputStream(out); 
-			dos.writeUTF("서버로부터의 메세지입니다.");
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-			
-		} finally{
-			if ( dos != null )
-				try {
-					dos.close();
-				} catch (IOException e) {}
-			if ( out != null ) {
-				try {
-					out.close();
-				} catch (IOException e) {}
+		while (true) {
+			int s = 0;
+			try {
+				s = in.read();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			Collection<ClientThread> clients = Server.map.values();
+			for (ClientThread client : clients) {
+				client.send(s);
+			}
+		}
+	}
+
+	private void send(int s) {
+		// TODO Auto-generated method stub
+		try {
+			out.write(s);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
