@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Panel;
+import java.awt.RenderingHints.Key;
 import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.event.KeyEvent;
@@ -84,6 +85,19 @@ implements WindowListener, MouseListener, KeyListener{
 		}).start();
 	}
 	
+	private void sendAction() {
+		String msg = sendArea.getText();
+		sendArea.setText("");
+		if (msg != "") {
+			try {
+				out.writeUTF(msg);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	}
+	
 	@Override
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
@@ -92,7 +106,9 @@ implements WindowListener, MouseListener, KeyListener{
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			sendAction();
+		}
 		
 	}
 
@@ -104,17 +120,7 @@ implements WindowListener, MouseListener, KeyListener{
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
-		String msg = sendArea.getText();
-		sendArea.setText("");
-		if (msg != "") {
-			try {
-				out.writeUTF(msg);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
+		sendAction();
 	}
 
 	@Override
